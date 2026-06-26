@@ -1,0 +1,95 @@
+/* ============================================
+   ALMOXARIFADO TI — tables.css
+   Tabelas, toolbar, badges e estados vazios
+   ============================================ */
+
+/* ---------- TABLE WRAP ---------- */
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.table-toolbar {
+  padding: .75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: .45rem .75rem;
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  width: 220px;
+}
+.search-input:focus { border-color: var(--accent); }
+
+.filter-select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: .45rem .75rem;
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+}
+
+/* ---------- TABLE ---------- */
+table           { width: 100%; border-collapse: collapse; }
+thead           { background: var(--surface2); }
+
+th {
+  padding: .65rem 1rem;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  white-space: nowrap;
+}
+
+td {
+  padding: .65rem 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+tr:hover td       { background: rgba(255, 255, 255, .025); }
+.row-alert td     { background: #1c0a00 !important; }
+
+/* ---------- BADGES ---------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.badge-green { background: #052e16; color: #4ade80; }
+.badge-red   { background: #450a0a; color: #f87171; }
+.badge-amber { background: #451a03; color: #fcd34d; }
+.badge-blue  { background: #0c1a3e; color: #60a5fa; }
+.badge-gray  { background: var(--surface2); color: var(--muted); }
+
+/* ---------- EMPTY STATE ---------- */
+.empty-state { padding: 3rem 1rem; text-align: center; color: var(--muted); }
+.empty-icon  { font-size: 32px; margin-bottom: .5rem; }
+
+/* ---------- HISTÓRICO: tipo ---------- */
+.tipo-entrada { color: var(--green); }
+.tipo-saida   { color: var(--red);   }

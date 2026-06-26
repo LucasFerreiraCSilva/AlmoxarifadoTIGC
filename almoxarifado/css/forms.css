@@ -1,0 +1,133 @@
+/* ============================================
+   ALMOXARIFADO TI — forms.css
+   Formulários, inputs, botões e controles
+   ============================================ */
+
+/* ---------- FORM CARD ---------- */
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  max-width: 620px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-group            { margin-bottom: 1.25rem; }
+.form-group.span2      { grid-column: span 2; }
+
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: .4rem;
+  letter-spacing: .04em;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: .6rem .75rem;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color .2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--accent);
+}
+
+.form-group textarea        { resize: vertical; min-height: 80px; }
+.form-group select option   { background: var(--surface); }
+.form-actions               { display: flex; gap: .75rem; margin-top: 1.25rem; }
+
+/* ---------- BOTÕES ---------- */
+.btn {
+  border-radius: var(--radius);
+  padding: .6rem 1.1rem;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  transition: opacity .2s;
+}
+.btn:hover       { opacity: .85; }
+.btn-save        { background: var(--accent); color: #fff; }
+.btn-danger      { background: var(--red);    color: #fff; }
+.btn-ghost       { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+.btn-ghost:hover { color: var(--text); border-color: var(--text); opacity: 1; }
+.btn-sm          { padding: .35rem .75rem; font-size: 12px; }
+
+.btn-primary {
+  width: 100%;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: .7rem;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity .2s;
+}
+.btn-primary:hover { opacity: .85; }
+
+.btn-logout {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: .45rem;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .15s;
+}
+.btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+/* ---------- MOVIMENTAÇÃO: controles de qtd ---------- */
+.qty-controls { display: flex; align-items: center; gap: .6rem; }
+
+.qty-btn {
+  width: 32px; height: 32px;
+  border-radius: var(--radius);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+  transition: background .15s;
+}
+.qty-btn:hover { background: var(--border); }
+
+.qty-input {
+  width: 80px;
+  text-align: center;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: .6rem;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+}

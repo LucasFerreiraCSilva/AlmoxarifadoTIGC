@@ -7,7 +7,7 @@ const CONFIG = {
   /** Credenciais (texto simples para uso offline/local).
    *  Em produção, substitua por autenticação server-side. */
   USERS: {
-    admin: '24022922',
+    admin: '40028922',
     ti:    'L0c4l#4dm!n'
   },
 

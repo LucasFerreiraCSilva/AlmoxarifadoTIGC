@@ -1,11 +1,6 @@
-/* ============================================
-   ALMOXARIFADO TI — services/userService.js
-   Gerenciamento de usuários via Supabase
-   ============================================ */
-
 const UserService = {
   async getAll() {
-    const { data } = await supabase
+    const { data } = await db
       .from('usuarios')
       .select('*')
       .order('created_at');
@@ -13,7 +8,7 @@ const UserService = {
   },
 
   async usernameExists(username) {
-    const { data } = await supabase
+    const { data } = await db
       .from('usuarios')
       .select('id')
       .eq('username', username)
@@ -32,7 +27,7 @@ const UserService = {
     const exists = await this.usernameExists(username);
     if (exists) return { success: false, error: 'Esse nome de usuário já está em uso!' };
 
-    const { error } = await supabase
+    const { error } = await db
       .from('usuarios')
       .insert({ username: username.trim(), password, role: role || 'operador' });
 
@@ -50,7 +45,7 @@ const UserService = {
     if (target.role === 'admin' && users.filter(u => u.role === 'admin').length <= 1)
       return { success: false, error: 'Deve existir ao menos um administrador!' };
 
-    const { error } = await supabase.from('usuarios').delete().eq('id', id);
+    const { error } = await db.from('usuarios').delete().eq('id', id);
     if (error) return { success: false, error: 'Erro ao remover: ' + error.message };
     return { success: true };
   },
@@ -59,7 +54,7 @@ const UserService = {
     if (!newPassword || newPassword.length < 4)
       return { success: false, error: 'A senha deve ter no mínimo 4 caracteres!' };
 
-    const { error } = await supabase
+    const { error } = await db
       .from('usuarios')
       .update({ password: newPassword })
       .eq('id', id);

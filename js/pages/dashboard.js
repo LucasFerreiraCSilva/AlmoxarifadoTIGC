@@ -16,7 +16,7 @@ async function renderPainel() {
   `;
 
   // Conta movimentações em paralelo
-  supabase.from('movements').select('id', { count: 'exact', head: true })
+ db.from('movements').select('id', { count: 'exact', head: true })
     .then(({ count }) => {
       const el = document.getElementById('mov-count');
       if (el) el.textContent = count || 0;

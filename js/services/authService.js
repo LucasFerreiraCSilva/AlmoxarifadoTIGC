@@ -8,17 +8,26 @@ const AuthService = {
 
   async login(username, password) {
     try {
-      const { data, error } = await supabase
+      const response = await supabase
         .from('usuarios')
-        .select('*')
+        .select('username, role')
         .eq('username', username)
         .eq('password', password)
-        .maybeSingle();   // retorna null em vez de erro quando não encontra
+        .limit(1);
 
-      if (!data) return false;
+      console.log('Login response:', response);
 
-      this.currentUser = data.username;
-      this.currentRole = data.role;
+      if (response.error) {
+        console.error('Supabase error:', response.error);
+        return false;
+      }
+
+      const rows = response.data;
+      if (!rows || rows.length === 0) return false;
+
+      const user = rows[0];
+      this.currentUser = user.username;
+      this.currentRole = user.role;
       return true;
     } catch (e) {
       console.error('Erro no login:', e);

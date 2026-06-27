@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Almoxarifado TI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <link rel="stylesheet" href="css/tables.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">📦</div>
+    <div class="login-title">Almoxarifado TI</div>
+    <div class="login-sub">Controle de estoque e patrimônio</div>
+    <div class="field">
+      <label>Usuário</label>
+      <input type="text" id="login-user" placeholder="Digite seu usuário" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Senha</label>
+      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn-primary" onclick="doLogin()">Entrar</button>
+    <div id="login-error" class="error-msg" style="display:none">Usuário ou senha inválidos.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">📦</div>
+      <div class="logo-text">Almoxarifado TI</div>
+      <div class="logo-sub">Gestão de Estoque</div>
+    </div>
+    <nav>
+      <div class="nav-item active" data-page="painel" onclick="goTo('painel',this)">
+        <span class="icon">📊</span> Painel
+        <span class="nav-badge" id="badge-alerta" style="display:none">!</span>
+      </div>
+      <div class="nav-item" data-page="cadastro" onclick="goTo('cadastro',this)">
+        <span class="icon">➕</span> Cadastrar Item
+      </div>
+      <div class="nav-item" data-page="movimentacao" onclick="goTo('movimentacao',this)">
+        <span class="icon">🔄</span> Movimentação
+      </div>
+      <div class="nav-item" data-page="historico" onclick="goTo('historico',this)">
+        <span class="icon">📋</span> Histórico
+      </div>
+      <div class="nav-item" data-page="editar" onclick="goTo('editar',this)">
+        <span class="icon">✏️</span> Editar Item
+      </div>
+      <div class="nav-item" data-page="remover" onclick="goTo('remover',this)">
+        <span class="icon">🗑️</span> Remover Item
+      </div>
+      <!-- visível só para admin -->
+      <div class="nav-item" id="nav-usuarios" data-page="usuarios" onclick="goTo('usuarios',this)" style="display:none">
+        <span class="icon">👥</span> Usuários
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-row">
+        <div class="user-avatar" id="user-avatar">AD</div>
+        <div>
+          <div class="user-name" id="user-display">admin</div>
+          <div class="user-role" id="user-role-badge">Operador</div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">🚪 Sair da conta</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- PAINEL -->
+    <div class="page active" id="page-painel">
+      <div class="page-header">
+        <div><div class="page-title">Painel</div><div class="page-sub">Visão geral do estoque</div></div>
+      </div>
+      <div class="cards-grid" id="stat-cards"></div>
+      <div id="alert-strip"></div>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <input class="search-input" type="text" id="painel-search" placeholder="Buscar por código ou nome…" oninput="renderPainel()">
+          <select class="filter-select" id="painel-cat" onchange="renderPainel()">
+            <option value="">Todas as categorias</option>
+          </select>
+        </div>
+        <table>
+          <thead><tr><th>Código</th><th>Nome</th><th>Categoria</th><th>Localização</th><th>Qtd.</th><th>Mínimo</th><th>Status</th></tr></thead>
+          <tbody id="painel-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CADASTRAR ITEM -->
+    <div class="page" id="page-cadastro">
+      <div class="page-header">
+        <div><div class="page-title">Cadastrar Item</div><div class="page-sub">Adicione um novo item ao estoque</div></div>
+      </div>
+      <div id="cad-msg"></div>
+      <div class="form-card">
+        <div class="form-grid">
+          <div class="form-group"><label>Código <span class="required">*</span></label><input type="text" id="cad-codigo" placeholder="ex: TI-001"></div>
+          <div class="form-group"><label>Nome</label><input type="text" id="cad-nome" placeholder="ex: Cabo HDMI 2m"></div>
+          <div class="form-group"><label>Categoria</label><input type="text" id="cad-categoria" list="cat-list" placeholder="ex: Cabeamento"><datalist id="cat-list"></datalist></div>
+          <div class="form-group"><label>Localização</label><input type="text" id="cad-local" placeholder="ex: Armário A - Prateleira 2"></div>
+          <div class="form-group"><label>Quantidade inicial</label><input type="number" id="cad-qty" value="0" min="0"></div>
+          <div class="form-group"><label>Estoque mínimo</label><input type="number" id="cad-min" value="0" min="0"></div>
+          <div class="form-group span2"><label>Observação</label><textarea id="cad-obs" placeholder="Informações adicionais…"></textarea></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-save" onclick="cadastrarItem()">Cadastrar item</button>
+          <button class="btn btn-ghost" onclick="limparCadastro()">Limpar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOVIMENTAÇÃO -->
+    <div class="page" id="page-movimentacao">
+      <div class="page-header">
+        <div><div class="page-title">Movimentação</div><div class="page-sub">Registre entradas e saídas</div></div>
+      </div>
+      <div id="mov-msg"></div>
+      <div class="form-card">
+        <div class="form-group"><label>Item <span class="required">*</span></label><select id="mov-item" onchange="updateItemInfo()"><option value="">Selecione um item…</option></select></div>
+        <div id="mov-info-box" class="item-info-box" style="display:none">
+          <div class="info-item"><div class="i-label">Código</div><div class="i-val" id="info-codigo">—</div></div>
+          <div class="info-item"><div class="i-label">Qtd. atual</div><div class="i-val" id="info-qty">—</div></div>
+          <div class="info-item"><div class="i-label">Estoque mínimo</div><div class="i-val" id="info-min">—</div></div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group"><label>Tipo</label><select id="mov-tipo"><option value="entrada">📥 Entrada</option><option value="saida">📤 Saída</option></select></div>
+          <div class="form-group"><label>Quantidade <span class="required">*</span></label>
+            <div class="qty-controls">
+              <button class="qty-btn" onclick="adjQty(-1)">−</button>
+              <input class="qty-input" type="number" id="mov-qty" value="1" min="1">
+              <button class="qty-btn" onclick="adjQty(1)">+</button>
+            </div>
+          </div>
+          <div class="form-group"><label>Responsável</label><input type="text" id="mov-resp" placeholder="Nome do responsável"></div>
+          <div class="form-group span2"><label>Observação</label><textarea id="mov-obs" placeholder="Motivo, destino, etc…"></textarea></div>
+        </div>
+        <div class="form-actions"><button class="btn btn-save" onclick="registrarMovimento()">Registrar movimentação</button></div>
+      </div>
+    </div>
+
+    <!-- HISTÓRICO -->
+    <div class="page" id="page-historico">
+      <div class="page-header">
+        <div><div class="page-title">Histórico</div><div class="page-sub">Todas as movimentações registradas</div></div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <input class="search-input" type="text" id="hist-search" placeholder="Buscar por item ou responsável…" oninput="renderHistorico()">
+          <select class="filter-select" id="hist-tipo" onchange="renderHistorico()">
+            <option value="">Todos os tipos</option><option value="entrada">Entradas</option><option value="saida">Saídas</option>
+          </select>
+          <input class="search-input" type="date" id="hist-data-ini" onchange="renderHistorico()" style="width:auto">
+          <input class="search-input" type="date" id="hist-data-fim" onchange="renderHistorico()" style="width:auto">
+        </div>
+        <table>
+          <thead><tr><th>Data</th><th>Item</th><th>Tipo</th><th>Qtd.</th><th>Responsável</th><th>Observação</th></tr></thead>
+          <tbody id="hist-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- EDITAR ITEM -->
+    <div class="page" id="page-editar">
+      <div class="page-header">
+        <div><div class="page-title">Editar Item</div><div class="page-sub">Atualize dados cadastrais do item</div></div>
+      </div>
+      <div class="form-card" style="margin-bottom:1.25rem;padding:1rem 1.25rem;display:flex;gap:.75rem;align-items:flex-end;max-width:620px">
+        <div style="flex:1">
+          <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:.4rem">Selecionar item</label>
+          <select id="edit-select" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:.6rem .75rem;color:var(--text);font-size:14px;font-family:inherit;outline:none"><option value="">Selecione…</option></select>
+        </div>
+        <button class="btn btn-ghost" onclick="loadEditForm()">Carregar</button>
+      </div>
+      <div id="edit-msg"></div>
+      <div class="form-card" id="edit-form" style="display:none">
+        <div class="form-grid">
+          <div class="form-group"><label>Código <span class="required">*</span></label><input type="text" id="edit-codigo"></div>
+          <div class="form-group"><label>Nome</label><input type="text" id="edit-nome"></div>
+          <div class="form-group"><label>Categoria</label><input type="text" id="edit-categoria"></div>
+          <div class="form-group"><label>Localização</label><input type="text" id="edit-local"></div>
+          <div class="form-group"><label>Estoque mínimo</label><input type="number" id="edit-min" min="0"></div>
+          <div class="form-group span2"><label>Observação</label><textarea id="edit-obs"></textarea></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-save" onclick="salvarEdicao()">Salvar alterações</button>
+          <button class="btn btn-ghost" onclick="cancelarEdicao()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- REMOVER ITEM -->
+    <div class="page" id="page-remover">
+      <div class="page-header">
+        <div><div class="page-title">Remover Item</div><div class="page-sub">Exclua permanentemente um item do estoque</div></div>
+      </div>
+      <div id="rem-msg"></div>
+      <div class="form-card">
+        <div class="form-group"><label>Selecionar item para remover</label><select id="rem-select"><option value="">Selecione…</option></select></div>
+        <div id="rem-preview" class="item-info-box" style="display:none">
+          <div class="info-item"><div class="i-label">Código</div><div class="i-val" id="rem-codigo">—</div></div>
+          <div class="info-item"><div class="i-label">Qtd. atual</div><div class="i-val" id="rem-qty">—</div></div>
+          <div class="info-item"><div class="i-label">Categoria</div><div class="i-val" id="rem-cat">—</div></div>
+        </div>
+        <div class="form-actions"><button class="btn btn-danger" onclick="confirmarRemocao()">🗑️ Remover item</button></div>
+      </div>
+    </div>
+
+    <!-- GERENCIAR USUÁRIOS (admin only) -->
+    <div class="page" id="page-usuarios">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Gerenciar Usuários</div>
+          <div class="page-sub">Crie, edite e remova acessos ao sistema</div>
+        </div>
+      </div>
+      <div id="user-msg"></div>
+
+      <!-- Formulário de criação -->
+      <div class="form-card" style="margin-bottom:1.5rem">
+        <div style="font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem">➕ Novo usuário</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nome de usuário <span class="required">*</span></label>
+            <input type="text" id="new-username" placeholder="ex: joao_silva" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label>Perfil</label>
+            <select id="new-role">
+              <option value="operador">👤 Operador</option>
+              <option value="admin">🔑 Administrador</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Senha <span class="required">*</span></label>
+            <input type="password" id="new-password" placeholder="Mínimo 4 caracteres" oninput="checkPwdStrength()" autocomplete="new-password">
+            <div id="pwd-strength" style="margin-top:4px;min-height:16px"></div>
+          </div>
+          <div class="form-group" style="display:flex;align-items:flex-end">
+            <button class="btn btn-save" style="width:100%" onclick="criarUsuario()">Criar usuário</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabela de usuários -->
+      <div class="table-wrap">
+        <div class="table-toolbar" style="justify-content:space-between">
+          <span style="font-size:13px;color:var(--muted)">Total: <strong id="user-count" style="color:var(--text)">0</strong> usuário(s)</span>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Usuário</th><th>Perfil</th><th>Criado em</th><th>Ações</th></tr>
+          </thead>
+          <tbody id="users-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL DE CONFIRMAÇÃO -->
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Confirmar ação</div>
+    <div class="modal-body" id="modal-body">Tem certeza que deseja continuar?</div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-danger" onclick="execModal()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE TROCA DE SENHA -->
+<div class="modal-overlay" id="modal-pwd">
+  <div class="modal">
+    <div class="modal-title" id="pwd-modal-title">Alterar senha</div>
+    <input type="hidden" id="pwd-modal-id">
+    <div style="margin-bottom:1rem">
+      <div class="form-group" style="margin-bottom:.75rem">
+        <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:.4rem">Nova senha</label>
+        <input type="password" id="pwd-modal-new" placeholder="Mínimo 4 caracteres"
+               style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:.6rem .75rem;color:var(--text);font-size:14px;font-family:inherit;outline:none">
+      </div>
+      <div class="form-group" style="margin-bottom:.75rem">
+        <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:.4rem">Confirmar senha</label>
+        <input type="password" id="pwd-modal-confirm" placeholder="Repita a senha"
+               style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:.6rem .75rem;color:var(--text);font-size:14px;font-family:inherit;outline:none">
+      </div>
+      <div id="pwd-modal-msg"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closePwdModal()">Cancelar</button>
+      <button class="btn btn-save" onclick="salvarNovaSenha()">Salvar senha</button>
+    </div>
+  </div>
+</div>
+
+<!-- JS — ordem importa -->
+<script src="js/config.js"></script>
+<script src="js/utils/helpers.js"></script>
+<script src="js/utils/formatters.js"></script>
+<script src="js/utils/validators.js"></script>
+<script src="js/services/storage.js"></script>
+<script src="js/services/userService.js"></script>
+<script src="js/services/authService.js"></script>
+<script src="js/services/itemService.js"></script>
+<script src="js/services/movementService.js"></script>
+<script src="js/pages/dashboard.js"></script>
+<script src="js/pages/cadastro.js"></script>
+<script src="js/pages/movimentacao.js"></script>
+<script src="js/pages/historico.js"></script>
+<script src="js/pages/editar.js"></script>
+<script src="js/pages/remover.js"></script>
+<script src="js/pages/usuarios.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>

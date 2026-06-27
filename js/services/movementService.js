@@ -1,11 +1,6 @@
-/* ============================================
-   ALMOXARIFADO TI — services/movementService.js
-   Movimentações via Supabase
-   ============================================ */
-
 const MovementService = {
   async getAll() {
-    const { data } = await supabase
+    const { data } = await db
       .from('movements')
       .select('*, items(nome, codigo)')
       .order('created_at', { ascending: false });
@@ -20,7 +15,7 @@ const MovementService = {
     const result = await ItemService.adjustQuantity(item_id, delta);
     if (!result.success) return result;
 
-    const { error } = await supabase.from('movements').insert({
+    const { error } = await db.from('movements').insert({
       item_id, tipo, quantidade, responsavel, observacao
     });
 
@@ -28,7 +23,6 @@ const MovementService = {
     return { success: true, newQty: result.newQty };
   },
 
-  // Retorna movimentações já com nome/codigo do item embutidos
   async getEnriched() {
     const movs = await this.getAll();
     return movs.map(m => ({

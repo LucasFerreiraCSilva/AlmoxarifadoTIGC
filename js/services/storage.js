@@ -3,8 +3,7 @@
    Cliente Supabase centralizado
    ============================================ */
 
-const { createClient } = window.supabase;
-const supabase = createClient(
+const supabase = supabasejs.createClient(
   CONFIG.SUPABASE_URL,
   CONFIG.SUPABASE_KEY
 );

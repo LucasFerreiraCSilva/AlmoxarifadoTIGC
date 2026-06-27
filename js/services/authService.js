@@ -1,7 +1,3 @@
-/* ============================================
-   ALMOXARIFADO TI — services/authService.js
-   ============================================ */
-
 const AuthService = {
   currentUser: null,
   currentRole: null,

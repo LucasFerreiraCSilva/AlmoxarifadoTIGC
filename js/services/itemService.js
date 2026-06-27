@@ -1,11 +1,6 @@
-/* ============================================
-   ALMOXARIFADO TI — services/itemService.js
-   CRUD de itens via Supabase
-   ============================================ */
-
 const ItemService = {
   async getAll() {
-    const { data } = await supabase
+    const { data } = await db
       .from('items')
       .select('*')
       .order('nome');
@@ -13,7 +8,7 @@ const ItemService = {
   },
 
   async findById(id) {
-    const { data } = await supabase
+    const { data } = await db
       .from('items')
       .select('*')
       .eq('id', id)
@@ -22,7 +17,7 @@ const ItemService = {
   },
 
   async findByCodigo(codigo) {
-    const { data } = await supabase
+    const { data } = await db
       .from('items')
       .select('*')
       .eq('codigo', codigo)
@@ -38,7 +33,7 @@ const ItemService = {
     const v = validateCodigo(codigo);
     if (!v.valid) return { success: false, error: v.error };
 
-    const { error } = await supabase.from('items').insert({
+    const { error } = await db.from('items').insert({
       codigo, nome, categoria, localizacao, quantidade, estoque_minimo, observacao
     });
 
@@ -55,7 +50,7 @@ const ItemService = {
     const v = validateCodigo(codigo);
     if (!v.valid) return { success: false, error: v.error };
 
-    const { error } = await supabase
+    const { error } = await db
       .from('items')
       .update({ codigo, nome, categoria, localizacao, estoque_minimo, observacao })
       .eq('id', id);
@@ -79,7 +74,7 @@ const ItemService = {
       return { success: false, error: v.error };
     }
 
-    const { error } = await supabase
+    const { error } = await db
       .from('items')
       .update({ quantidade: newQty })
       .eq('id', id);
@@ -89,7 +84,7 @@ const ItemService = {
   },
 
   async remove(id) {
-    const { error } = await supabase.from('items').delete().eq('id', id);
+    const { error } = await db.from('items').delete().eq('id', id);
     if (error) return { success: false, error: 'Erro ao remover: ' + error.message };
     return { success: true };
   },

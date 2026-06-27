@@ -8,7 +8,7 @@ const AuthService = {
 
   async login(username, password) {
     try {
-      const response = await supabase
+      const response = await db
         .from('usuarios')
         .select('username, role')
         .eq('username', username)

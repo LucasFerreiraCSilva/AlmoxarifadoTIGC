@@ -1,4 +1,4 @@
-const db = supabase.createClient(
+var db = supabase.createClient(
   CONFIG.SUPABASE_URL,
   CONFIG.SUPABASE_KEY
 );

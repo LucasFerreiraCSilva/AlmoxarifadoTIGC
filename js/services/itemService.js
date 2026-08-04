@@ -1,3 +1,5 @@
+//Cadastro/Edição/Exclusão de itens//
+
 const ItemService = {
   async getAll() {
     const { data } = await db

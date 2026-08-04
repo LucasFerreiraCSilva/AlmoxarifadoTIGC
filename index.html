@@ -12,10 +12,59 @@
   <link rel="stylesheet" href="css/tables.css">
   <link rel="stylesheet" href="css/components.css">
 
-  <!-- Supabase SDK -->
+  <!-- BD Supabase-->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
+
+
+  <!-- MODAL EDITAR MOVIMENTAÇÃO -->
+<div class="modal-overlay" id="modal-edit-mov">
+  <div class="modal">
+    <div class="modal-title">✏️ Editar Movimentação</div>
+    <input type="hidden" id="edit-mov-id">
+    <div style="margin-bottom:1rem">
+      <div class="form-group" style="margin-bottom:.75rem">
+        <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:.4rem">Responsável</label>
+        <input type="text" id="edit-mov-resp"
+          style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:.6rem .75rem;color:var(--text);font-size:14px;font-family:inherit;outline:none">
+      </div>
+      <div class="form-group" style="margin-bottom:.75rem">
+        <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:.4rem">Observação</label>
+        <textarea id="edit-mov-obs"
+          style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:.6rem .75rem;color:var(--text);font-size:14px;font-family:inherit;outline:none;resize:vertical;min-height:80px"></textarea>
+      </div>
+      <div id="edit-mov-msg"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="fecharEditarMovimento()">Cancelar</button>
+      <button class="btn btn-save" onclick="salvarEdicaoMovimento()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR CRIAÇÃO DE ADMIN -->
+<div class="modal-overlay" id="modal-confirm-admin">
+  <div class="modal">
+    <div class="modal-title">🔑 Confirmar criação de Admin</div>
+    <div class="modal-body">
+      Você está criando o usuário <strong id="confirm-admin-user"></strong> como <strong>Administrador</strong>.
+      Digite sua senha para confirmar.
+    </div>
+    <div style="margin-bottom:1rem">
+      <div class="form-group" style="margin-bottom:.75rem">
+        <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:.4rem">Sua senha</label>
+        <input type="password" id="confirm-admin-pass" placeholder="••••••••"
+          style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:.6rem .75rem;color:var(--text);font-size:14px;font-family:inherit;outline:none">
+      </div>
+      <div id="confirm-admin-msg"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="fecharConfirmAdmin()">Cancelar</button>
+      <button class="btn btn-save" onclick="confirmarCriacaoAdmin()">Confirmar</button>
+    </div>
+  </div>
+</div>
 
 <!-- LOGIN -->
 <div id="login-screen">
@@ -150,34 +199,49 @@
       </div>
     </div>
 
-    <!-- MOVIMENTAÇÃO -->
-    <div class="page" id="page-movimentacao">
-      <div class="page-header">
-        <div><div class="page-title">Movimentação</div><div class="page-sub">Registre entradas e saídas</div></div>
+  <!-- ── MOVIMENTAÇÃO ── -->
+<div class="page" id="page-movimentacao">
+  <div class="page-header">
+    <div><div class="page-title">Movimentação</div><div class="page-sub">Registre entradas e saídas</div></div>
+  </div>
+  <div id="mov-msg"></div>
+  <div class="form-card" style="max-width:700px">
+
+    <!-- Tipo -->
+    <div class="form-group">
+      <label>Tipo</label>
+      <select id="mov-tipo" style="width:200px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:.6rem .75rem;color:var(--text);font-size:14px;font-family:inherit;outline:none">
+        <option value="entrada">📥 Entrada</option>
+        <option value="saida">📤 Saída</option>
+      </select>
+    </div>
+
+    <!-- Linhas de itens -->
+    <div id="mov-linhas"></div>
+
+    <!-- Botão adicionar item -->
+    <button class="btn btn-ghost" onclick="adicionarLinhaMovimentacao()"
+      style="width:100%;margin-bottom:1.25rem;border-style:dashed;color:var(--accent);border-color:var(--accent)">
+      + Adicionar item
+    </button>
+
+    <!-- Responsável e obs -->
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Responsável</label>
+        <input type="text" id="mov-resp" placeholder="Nome do responsável">
       </div>
-      <div id="mov-msg"></div>
-      <div class="form-card">
-        <div class="form-group"><label>Item <span class="required">*</span></label><select id="mov-item" onchange="updateItemInfo()"><option value="">Selecione um item…</option></select></div>
-        <div id="mov-info-box" class="item-info-box" style="display:none">
-          <div class="info-item"><div class="i-label">Código</div><div class="i-val" id="info-codigo">—</div></div>
-          <div class="info-item"><div class="i-label">Qtd. atual</div><div class="i-val" id="info-qty">—</div></div>
-          <div class="info-item"><div class="i-label">Estoque mínimo</div><div class="i-val" id="info-min">—</div></div>
-        </div>
-        <div class="form-grid">
-          <div class="form-group"><label>Tipo</label><select id="mov-tipo"><option value="entrada">📥 Entrada</option><option value="saida">📤 Saída</option></select></div>
-          <div class="form-group"><label>Quantidade <span class="required">*</span></label>
-            <div class="qty-controls">
-              <button class="qty-btn" onclick="adjQty(-1)">−</button>
-              <input class="qty-input" type="number" id="mov-qty" value="1" min="1">
-              <button class="qty-btn" onclick="adjQty(1)">+</button>
-            </div>
-          </div>
-          <div class="form-group"><label>Responsável</label><input type="text" id="mov-resp" placeholder="Nome do responsável"></div>
-          <div class="form-group span2"><label>Observação</label><textarea id="mov-obs" placeholder="Motivo, destino, etc…"></textarea></div>
-        </div>
-        <div class="form-actions"><button class="btn btn-save" onclick="registrarMovimento()">Registrar movimentação</button></div>
+      <div class="form-group span2">
+        <label>Observação</label>
+        <textarea id="mov-obs" placeholder="Motivo, destino, etc…"></textarea>
       </div>
     </div>
+
+    <div class="form-actions">
+      <button class="btn btn-save" onclick="registrarMovimento()">Registrar movimentação</button>
+    </div>
+  </div>
+</div>
 
     <!-- HISTÓRICO -->
     <div class="page" id="page-historico">
@@ -194,7 +258,17 @@
           <input class="search-input" type="date" id="hist-data-fim" onchange="renderHistorico()" style="width:auto">
         </div>
         <table>
-          <thead><tr><th>Data</th><th>Item</th><th>Tipo</th><th>Qtd.</th><th>Responsável</th><th>Observação</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Item</th>
+              <th>Tipo</th>
+              <th>Qtd.</th>
+              <th>Responsável</th>
+              <th>Observação</th>
+              <th id="hist-th-acoes" style="display:none">Ações</th>
+            </tr>
+          </thead>
           <tbody id="hist-tbody"></tbody>
         </table>
       </div>

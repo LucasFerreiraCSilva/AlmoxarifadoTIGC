@@ -1,7 +1,4 @@
-/* ============================================
-   ALMOXARIFADO TI — config.js
-   Preencha com suas credenciais do Supabase
-   ============================================ */
+//Conexão com o SUPABASE//
 
 const CONFIG = {
   SUPABASE_URL:     'https://olonfkxativeuxqemdzv.supabase.co',   

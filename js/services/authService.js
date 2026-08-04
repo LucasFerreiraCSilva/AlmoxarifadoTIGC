@@ -1,3 +1,5 @@
+//Autenticação//
+
 const AuthService = {
   currentUser: null,
   currentRole: null,

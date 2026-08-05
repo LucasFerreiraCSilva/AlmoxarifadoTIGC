@@ -1,7 +1,7 @@
 const http   = require('http');
 const net    = require('net');
 
-const IMPRESSORA_IP   = '10.201.114.50';
+const IMPRESSORA_IP   = '10.201.119.62';
 const IMPRESSORA_PORT = 9100;
 const SERVIDOR_PORT   = 3000;
 
